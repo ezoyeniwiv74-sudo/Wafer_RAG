@@ -1,0 +1,80 @@
+name: wafer-rag
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: wafer-qdrant
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6333:6333"
+      - "127.0.0.1:6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  qwen:
+    image: ollama/ollama:latest
+    container_name: wafer-qwen
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8333:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: "30m"
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_NO_CLOUD: "true"
+      HTTP_PROXY: "http://127.0.0.1:9"
+      HTTPS_PROXY: "http://127.0.0.1:9"
+      ALL_PROXY: "http://127.0.0.1:9"
+      NO_PROXY: "127.0.0.1,localhost"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  dinov2-api:
+    image: dinov2-company-inference:local
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.dinov2-inference
+      args:
+        BASE_IMAGE: dinov2:cuda12.1-large
+    container_name: dinov2-company-api
+    restart: unless-stopped
+    shm_size: 4gb
+    ports:
+      - "127.0.0.1:9911:8001"
+    environment:
+      HOME: /tmp
+      MODEL_CONFIG: /models/current/resolved_config.json
+      MODEL_CHECKPOINT: /models/current/best_model.pt
+      BINMAP_ADAPTER: /models/current/binmap_adapter/best_adapter.pt
+      MAX_UPLOAD_MB: "20"
+      MAX_BATCH_IMAGES: "32"
+      API_LOG_DIR: /logs
+      API_LOG_RETENTION_DAYS: "30"
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      HF_DATASETS_OFFLINE: "1"
+      HTTP_PROXY: "http://127.0.0.1:9"
+      HTTPS_PROXY: "http://127.0.0.1:9"
+      ALL_PROXY: "http://127.0.0.1:9"
+      NO_PROXY: "127.0.0.1,localhost"
+    volumes:
+      - ./models/deployed_model:/models/current:ro
+      - dinov2_api_logs:/logs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+volumes:
+  qdrant_storage:
+  ollama_models:
+  dinov2_api_logs:

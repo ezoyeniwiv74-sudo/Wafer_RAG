@@ -1,0 +1,7 @@
+docker_image/*.tar
+docker_image/*.tar.*
+outputs
+data_company
+**/__pycache__
+**/*.pyc
+*.zip

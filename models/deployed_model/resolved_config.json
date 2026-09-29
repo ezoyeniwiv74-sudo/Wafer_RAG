@@ -1,0 +1,69 @@
+{
+  "data": {
+    "csv_path": "/data/labels.csv",
+    "image_root": "/data",
+    "image_column": "image_path",
+    "label_column": "label",
+    "csv_separator": ";",
+    "split_column": "split"
+  },
+  "class_names": [
+    "Defect_1",
+    "Defect_2",
+    "Defect_3",
+    "Defect_4",
+    "Defect_5",
+    "Defect_6"
+  ],
+  "num_classes": 6,
+  "model": {
+    "name": "dinov2_vitl14",
+    "repo_dir": "/package/training/vendor/dinov2-main",
+    "weights": "/app/weights/dinov2_vitl14_pretrain.pth",
+    "image_size": 224,
+    "feature_layers": 4,
+    "include_patch_mean": true,
+    "dropout": 0.2
+  },
+  "split": {
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 2026
+  },
+  "augmentation": {
+    "horizontal_flip": true,
+    "vertical_flip": true,
+    "rotation_degrees": 8,
+    "autocontrast_probability": 0.2,
+    "blur_probability": 0.1
+  },
+  "training": {
+    "cache_backbone_features": true,
+    "feature_cache_train_views": 3,
+    "head_epochs": 60,
+    "head_lr": 0.001,
+    "unfreeze_last_blocks": 0,
+    "finetune_epochs": 0,
+    "backbone_lr": 5e-06,
+    "finetune_head_lr": 5e-05,
+    "batch_size": 4,
+    "feature_batch_size": 256,
+    "gradient_accumulation": 4,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.05,
+    "early_stopping_patience": 12,
+    "num_workers": 4,
+    "amp": true,
+    "sampler_power": 0.5,
+    "selection_metric": "macro_f1"
+  },
+  "inference": {
+    "tta": [
+      "identity",
+      "hflip",
+      "vflip"
+    ]
+  },
+  "output_dir": "/outputs/company_dinov2_large",
+  "_config_path": "/tmp/company.runtime.yaml"
+}

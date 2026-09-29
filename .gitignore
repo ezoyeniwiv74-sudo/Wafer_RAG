@@ -1,0 +1,75 @@
+# Local Python/runtime environments
+.runtime/
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyd
+
+# Test, tool, and application caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Logs and generated outputs
+*.log
+.logs/
+logs/
+outputs/
+output/
+runs/
+checkpoints/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+deploy.env
+*.pem
+*.key
+
+# User/runtime data
+data_company/
+datasets/
+
+# Vendored local runtime binaries and offline packages
+application/_vendor/
+server/inference_api/wheelhouse_api/
+server/training_package/wheelhouse/
+*.whl
+
+# Training artifacts
+models/**/*.pth
+models/**/*.pt
+models/**/*.ckpt
+models/**/*.safetensors
+
+# Docker images and exported container artifacts (keep Dockerfiles/Compose files)
+docker_images/
+docker_image/
+*.tar
+*.tar.gz
+
+# IDE and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Keep the requested project data and model assets.
+!application/data/
+!application/data/**
+!application/.cache/
+!application/.cache/**
+!models/
+!models/**
+
+# Keep model configuration, but never commit model binaries.
+models/**/*.pth
+models/**/*.pt
+models/**/*.ckpt
+models/**/*.safetensors
+

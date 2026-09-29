@@ -1,0 +1,36 @@
+[
+  {
+    "file_name": "ppt输入.pptx",
+    "stored_path": "E:\\wafer_search_project\\data\\ppt_uploads\\8bef66ddf444_ppt输入.pptx",
+    "sha256": "8bef66ddf444f59bc2bd311d7e3a7e372f1425454865abfc2108cd2f705e0808",
+    "imported_at": "2026-08-18T01:20:47+08:00",
+    "slide_count": 1,
+    "record_count": 1,
+    "image_count": 4,
+    "records": [
+      {
+        "dn_no": "DN-20260517-13",
+        "slide": 1,
+        "images": [
+          {
+            "image_type": "TypicalMap",
+            "file_name": "TypicalMap.png"
+          },
+          {
+            "image_type": "TypicalMap2",
+            "file_name": "TypicalMap2.png"
+          },
+          {
+            "image_type": "TypicalDefectImage1",
+            "file_name": "TypicalDefectImage1.png"
+          },
+          {
+            "image_type": "TypicalDefectImage2",
+            "file_name": "TypicalDefectImage2.png"
+          }
+        ]
+      }
+    ],
+    "already_imported": false
+  }
+]

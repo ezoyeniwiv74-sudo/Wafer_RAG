@@ -1,0 +1,30 @@
+ARG BASE_IMAGE=dinov2:cuda12.1-large
+FROM ${BASE_IMAGE}
+
+LABEL org.opencontainers.image.title="Wafer RAG DINOv2 inference API"
+
+COPY server/training_package/training/requirements_company_image.txt /opt/company-training/requirements.txt
+COPY server/training_package/training/constraints_company_base.txt /opt/company-training/constraints.txt
+COPY server/training_package/wheelhouse /opt/company-training/wheelhouse
+
+RUN python -m pip install --no-cache-dir --no-index \
+      --find-links=/opt/company-training/wheelhouse \
+      --constraint /opt/company-training/constraints.txt \
+      -r /opt/company-training/requirements.txt && \
+    python -m pip check
+
+COPY server/training_package/training /package/training
+
+COPY server/inference_api/requirements_api.txt /opt/company-api/requirements_api.txt
+COPY server/inference_api/wheelhouse_api /opt/company-api/wheelhouse_api
+RUN python -m pip install --no-cache-dir --no-index \
+      --find-links=/opt/company-api/wheelhouse_api \
+      -r /opt/company-api/requirements_api.txt && \
+    python -m pip check
+
+COPY server/inference_api/inference_api /app/inference_api
+
+ENV PYTHONPATH=/package/training:/app
+WORKDIR /app
+EXPOSE 8001
+CMD ["python", "-m", "uvicorn", "inference_api.server:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]

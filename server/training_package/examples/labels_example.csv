@@ -1,0 +1,7 @@
+image_path;label;split
+images/class_a/sample_0001.png;A;train
+images/class_a/sample_0002.png;A;val
+images/class_a/sample_0003.png;A;test
+images/class_b/sample_0101.png;B;train
+images/class_b/sample_0102.png;B;val
+images/class_b/sample_0103.png;B;test

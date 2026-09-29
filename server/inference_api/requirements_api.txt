@@ -1,0 +1,6 @@
+# HTTP路由、参数校验和OpenAPI文档框架。
+fastapi==0.115.12
+# ASGI服务器，负责监听8001端口并运行FastAPI应用。
+uvicorn==0.34.3
+# 支持/api/v1/classify的multipart/form-data图片上传解析。
+python-multipart==0.0.20

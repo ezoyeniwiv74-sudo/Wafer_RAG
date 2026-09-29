@@ -1,0 +1,27 @@
+ARG BASE_IMAGE=dinov2:cuda12.1-large
+FROM ${BASE_IMAGE}
+
+LABEL org.opencontainers.image.title="DINOv2 semiconductor defect classifier training"
+LABEL org.opencontainers.image.description="Training layer built on the company DINOv2 CUDA 12.1 image"
+
+COPY training/requirements_company_image.txt /opt/company-training/requirements.txt
+COPY training/constraints_company_base.txt /opt/company-training/constraints.txt
+COPY wheelhouse /opt/company-training/wheelhouse
+
+RUN set -eux; \
+    if find /opt/company-training/wheelhouse -maxdepth 1 -type f -name '*.whl' | grep -q .; then \
+      python -m pip install --no-cache-dir --no-index \
+        --find-links=/opt/company-training/wheelhouse \
+        --constraint /opt/company-training/constraints.txt \
+        -r /opt/company-training/requirements.txt; \
+    else \
+      python -m pip install --no-cache-dir \
+        --constraint /opt/company-training/constraints.txt \
+        -r /opt/company-training/requirements.txt; \
+    fi; \
+    python -m pip check; \
+    python -c "import torch, numpy, PIL, pandas, sklearn, matplotlib; assert numpy.__version__ == '1.26.3'; assert PIL.__version__ == '10.0.1'; print('training image ready:', torch.__version__, torch.version.cuda)"
+
+COPY training /package/training
+WORKDIR /package/training
+CMD ["/bin/bash"]

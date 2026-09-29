@@ -1,0 +1,27 @@
+# API镜像继承已包含PyTorch、DINOv2源码及训练公共模块的分类训练镜像。
+ARG BASE_IMAGE=dinov2-company-training:latest
+FROM ${BASE_IMAGE}
+
+LABEL org.opencontainers.image.title="DINOv2 semiconductor defect inference API"
+
+# 复制API专用依赖清单和离线wheel；不从公网下载任何软件包。
+COPY requirements_api.txt /opt/company-api/requirements_api.txt
+COPY wheelhouse_api /opt/company-api/wheelhouse_api
+
+# --no-index禁止访问PyPI，--find-links指定只从随包wheelhouse查找依赖；随后检查版本冲突。
+RUN python -m pip install --no-cache-dir --no-index \
+      --find-links=/opt/company-api/wheelhouse_api \
+      -r /opt/company-api/requirements_api.txt && \
+    python -m pip check
+
+# 把本项目三个API Python文件复制到镜像内/app/inference_api。
+COPY inference_api /app/inference_api
+
+# /package/training使API能够导入训练包的src模型/数据代码；/app用于导入inference_api。
+ENV PYTHONPATH=/package/training:/app
+WORKDIR /app
+# EXPOSE是镜像端口说明；真正发布端口仍由docker run -p决定。
+EXPOSE 8001
+
+# 镜像默认行为：单进程启动FastAPI。部署流程若覆盖entrypoint，则改为用户手动输入此命令。
+CMD ["python", "-m", "uvicorn", "inference_api.server:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]

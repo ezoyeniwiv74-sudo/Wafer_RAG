@@ -1,0 +1,77 @@
+# ============================================================
+# 公司数据必须修改的配置：数据路径、类别名、类别数量
+# 容器启动时，宿主机 DATA_DIR 会挂载到 /data。
+# ============================================================
+data:
+  csv_path: "/data/labels.csv"
+  image_root: "/data"
+  image_column: "image_path"
+  label_column: "label"
+  csv_separator: ";"
+
+  # 强烈推荐公司数据在 CSV 中预先准备 split 列，值只能是 train/val/test，
+  # 并按 wafer/lot/设备/时间隔离，避免同源图片泄漏。
+  # 如果暂时没有 split 列，把下一行改为 null，脚本会执行按类别随机分层划分。
+  split_column: "split"
+
+# 顺序必须与 CSV 原始标签按“数字优先、再按文本”的排序一致。
+class_names: ["请替换_类别1", "请替换_类别2"]
+num_classes: 2
+
+model:
+  name: "dinov2_vitl14"
+
+  # DINOv2 源码已经随部署包提供，并在容器中挂载到 /package。
+  repo_dir: "/package/training/vendor/dinov2-main"
+
+  # 已对公司 tar 实物解析并严格加载验证；服务器上仍应运行 02_inspect_image.sh 校验上传结果。
+  weights: "/app/weights/dinov2_vitl14_pretrain.pth"
+
+  image_size: 224
+  feature_layers: 4
+  include_patch_mean: true
+  dropout: 0.20
+
+# split_column 不为 null 时，下列比例不参与划分，但仍保留用于配置校验。
+split:
+  val_ratio: 0.15
+  test_ratio: 0.15
+  seed: 2026
+
+augmentation:
+  horizontal_flip: true
+  vertical_flip: true
+  rotation_degrees: 8
+  autocontrast_probability: 0.20
+  blur_probability: 0.10
+
+training:
+  # 第一阶段冻结 DINOv2-L，仅提取并缓存特征后训练分类头，稳定且显存占用低。
+  cache_backbone_features: true
+  feature_cache_train_views: 3
+  head_epochs: 60
+  head_lr: 0.001
+
+  # 初次正式训练建议保持 0。基线稳定后，可在显存充足的服务器上改为 1，
+  # 并把 finetune_epochs 改为 10-20。
+  unfreeze_last_blocks: 0
+  finetune_epochs: 0
+  backbone_lr: 0.000005
+  finetune_head_lr: 0.00005
+
+  batch_size: 4
+  feature_batch_size: 256
+  gradient_accumulation: 4
+  weight_decay: 0.01
+  label_smoothing: 0.05
+  early_stopping_patience: 12
+  num_workers: 4
+  amp: true
+  sampler_power: 0.5
+  selection_metric: "macro_f1"
+
+inference:
+  tta: ["identity", "hflip", "vflip"]
+
+# 必须与 deploy.env 中 MODEL_OUTPUT_SUBDIR 一致。
+output_dir: "/outputs/company_dinov2_large"

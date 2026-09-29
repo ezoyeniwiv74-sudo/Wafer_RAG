@@ -1,0 +1,33 @@
+FROM nvcr.io/nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
+
+LABEL org.opencontainers.image.title="Wafer RAG DINOv2 pip-online inference API"
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates cuda-cupti-12-1 python3 python3-pip python-is-python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN --mount=type=bind,source=deploy/torch-2.3.1+cu121-cp310-cp310-linux_x86_64.whl,target=/tmp/torch-2.3.1+cu121-cp310-cp310-linux_x86_64.whl,readonly \
+    --mount=type=bind,source=deploy/nvidia_nccl_cu12-2.20.5-py3-none-manylinux2014_x86_64.whl,target=/tmp/nvidia_nccl_cu12-2.20.5-py3-none-manylinux2014_x86_64.whl,readonly \
+    python -m pip install --no-cache-dir \
+      --no-deps \
+      /tmp/nvidia_nccl_cu12-2.20.5-py3-none-manylinux2014_x86_64.whl \
+      /tmp/torch-2.3.1+cu121-cp310-cp310-linux_x86_64.whl && \
+    python -m pip install --no-cache-dir --no-deps \
+      --index-url https://download.pytorch.org/whl/cu121 torchvision==0.18.1
+
+COPY server/training_package/training/requirements_runtime.txt /opt/wafer/requirements_runtime.txt
+COPY server/inference_api/requirements_api.txt /opt/wafer/requirements_api.txt
+RUN python -m pip install --no-cache-dir \
+      -r /opt/wafer/requirements_runtime.txt \
+      -r /opt/wafer/requirements_api.txt && \
+    python -c "import torch, torchvision; assert torch.version.cuda == '12.1'; print(torch.__version__, torchvision.__version__)"
+
+COPY server/training_package/training /package/training
+COPY server/inference_api/inference_api /app/inference_api
+COPY models/dinov2_base/dinov2_vitl14_pretrain.pth /app/weights/dinov2_vitl14_pretrain.pth
+
+ENV PYTHONPATH=/package/training:/app
+WORKDIR /app
+EXPOSE 8001
+CMD ["python", "-m", "uvicorn", "inference_api.server:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]

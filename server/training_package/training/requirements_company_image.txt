@@ -1,0 +1,17 @@
+# 公司基础镜像已自带 torch/torchvision/timm/numpy/Pillow/PyYAML/tqdm。
+# 这里只安装交付训练程序确认缺失的包，避免替换公司已验证的 PyTorch/CUDA 栈。
+pandas==2.2.3
+scikit-learn==1.5.2
+matplotlib==3.9.2
+
+# 下面是 2026-08-03 在公司基础镜像上实际解析并通过 pip check 的传递依赖。
+scipy==1.15.3
+joblib==1.5.3
+threadpoolctl==3.6.0
+python-dateutil==2.9.0.post0
+tzdata==2026.3
+contourpy==1.3.2
+cycler==0.12.1
+fonttools==4.63.0
+kiwisolver==1.5.0
+pyparsing==3.3.2

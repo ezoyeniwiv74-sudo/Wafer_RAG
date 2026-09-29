@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>晶圆缺陷检索系统</title>
+  <link rel="stylesheet" href="/static/styles.css?v=20260922-multimodal-report">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><i></i><i></i></div>
+        <div class="brand-copy"><strong>晶圆缺陷检索</strong><span>Wafer Intelligence</span></div>
+      </div>
+
+      <div class="nav-label">工作台</div>
+      <nav class="nav-list" aria-label="主导航">
+        <a href="#/ppt" data-route="ppt"><span class="nav-icon icon-mask icon-presentation" aria-hidden="true"></span><span class="nav-copy"><b>PPT 解析</b><small>报告数据导入</small></span></a>
+        <a href="#/text" data-route="text"><span class="nav-icon icon-mask icon-search" aria-hidden="true"></span><span class="nav-copy"><b>文字检索</b><small>异常记录查询</small></span></a>
+        <a href="#/image" data-route="image"><span class="nav-icon icon-mask icon-image" aria-hidden="true"></span><span class="nav-copy"><b>图片检索</b><small>相似图像查询</small></span></a>
+        <a href="#/report" data-route="report"><span class="nav-icon icon-mask icon-report" aria-hidden="true"></span><span class="nav-copy"><b>可视化报告</b><small>根因分析看板</small></span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="sidebar-indicator"></span>
+        <div><strong>本地检索服务</strong><small>系统数据实时可用</small></div>
+      </div>
+    </aside>
+
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="topbar-path">
+          <span class="app-grid-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <div><strong id="pageTitle">晶圆缺陷检索系统</strong><span id="pageSubtitle"></span></div>
+        </div>
+        <div class="topbar-badge"><span></span>历史异常知识库</div>
+      </header>
+
+      <main>
+        <section class="page" id="page-ppt">
+          <div class="page-heading">
+            <div><span class="eyebrow">DATA INGESTION</span><h1>PPT 内容导入</h1><p>上传标准缺陷报告，将记录和图片整理到检索库。</p></div>
+          </div>
+          <div class="ppt-layout">
+            <aside class="panel compact-panel upload-panel">
+              <div class="panel-heading"><div><span class="step-index">01</span><h2>选择报告</h2></div><p>支持标准 PPTX 报告</p></div>
+              <label class="upload-zone" id="pptDrop">
+                <input id="pptFile" type="file" accept=".pptx" multiple>
+                <span class="upload-icon" aria-hidden="true"><i></i></span>
+                <strong>选择或拖入一个或多个 PPTX</strong>
+                <small>支持批量选择；单个文件不超过 100MB</small>
+              </label>
+              <div class="selected-file-list" id="pptSelectedFiles"></div>
+              <button class="button primary full" id="pptImport" disabled>批量导入</button>
+              <div class="section-heading"><h2>已导入文件</h2><span id="pptLibraryCount"></span></div>
+              <label class="library-search"><span class="icon-mask icon-search" aria-hidden="true"></span><input id="pptLibrarySearch" type="search" placeholder="文件名、DN、产品或设备" autocomplete="off"></label>
+              <div id="pptHistory" class="file-list"><div class="empty small">暂无导入记录</div></div>
+            </aside>
+            <div class="panel result-panel" id="pptResult">
+              <div id="pptLibraryOverview"></div>
+              <div class="empty large"><span class="empty-symbol">P</span><strong>请选择需要导入的 PPTX</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-text">
+          <div class="work-layout">
+            <aside class="filter-sidebar">
+              <div class="filter-head"><div><span class="eyebrow">REFINE RESULTS</span><strong>缩小结果范围</strong></div><button class="text-button" data-clear-filters>清空</button></div>
+              <p class="filter-description">同一字段可多选；不同字段会同时生效。综合搜索和字段筛选均可使用。</p>
+              <div class="filter-groups" data-filter-host></div>
+            </aside>
+            <div class="workspace">
+              <div class="workspace-heading"><div><span class="eyebrow">TEXT RETRIEVAL</span><h1>查找历史异常记录</h1><p>先选择与当前任务匹配的检索方式，再填写必要信息。</p></div></div>
+              <div class="search-console">
+                <div class="search-tabs" id="textTabs" role="tablist" aria-label="检索方式">
+                  <button class="active" data-mode="semantic" role="tab" aria-selected="true"><span class="tab-icon icon-mask icon-search" aria-hidden="true"></span><span><b>综合搜索</b><small>按异常描述查找</small></span></button>
+                  <button data-mode="dn" role="tab" aria-selected="false"><span class="tab-icon icon-mask icon-file" aria-hidden="true"></span><span><b>DN 编号</b><small>按唯一编号精确查找</small></span></button>
+                  <button data-mode="filter" role="tab" aria-selected="false"><span class="tab-icon icon-mask icon-filter" aria-hidden="true"></span><span><b>字段筛选</b><small>按业务字段组合查找</small></span></button>
+                </div>
+                <form class="text-search-form" id="textSearchForm">
+                  <div class="mode-search-panel" id="textSimplePanel">
+                    <label class="search-field-label" id="textQueryLabel" for="textQuery">异常描述</label>
+                    <div class="search-input-wrap"><span class="input-prefix" id="textInputPrefix">综合</span><input id="textQuery" autocomplete="off" placeholder="例如：晶圆边缘出现颗粒残留，良率下降"></div>
+                    <p class="text-mode-hint" id="textModeHint">可使用自然语言描述异常现象；左侧条件可进一步缩小结果范围。</p>
+                  </div>
+                  <div class="field-builder" id="fieldBuilderPanel" hidden>
+                    <div class="field-builder-head">
+                      <div><strong>筛选条件</strong><span>同一字段多个值按“任一匹配”，不同字段按“同时满足”</span></div>
+                      <button class="button compact ghost" type="button" id="addFieldCondition"><span aria-hidden="true">＋</span> 添加条件</button>
+                    </div>
+                    <div class="field-conditions" id="fieldConditions"></div>
+                    <div class="field-builder-foot"><span id="fieldConditionCount">已使用 1 / 3 个条件</span><span>输入时可从数据库候选值中选择</span></div>
+                  </div>
+                  <div class="search-actions">
+                    <button class="button primary" type="submit" id="textSubmit"><span class="button-icon icon-mask icon-search" aria-hidden="true"></span><span id="textSubmitLabel">搜索记录</span></button>
+                    <button class="button ghost" type="button" id="textReset"><span class="button-icon icon-mask icon-reset" aria-hidden="true"></span>重置</button>
+                  </div>
+                </form>
+                <div class="active-filters" id="textActiveFilters"></div>
+              </div>
+              <div class="result-meta" id="textMeta"></div>
+              <div class="batch-analysis-toolbar" id="textBatchToolbar" hidden>
+                <label><input type="checkbox" id="selectAllTextResults"><span>选择当前全部结果</span></label>
+                <div><span id="textAnalysisCount">已选 0 条</span><button class="text-button" type="button" id="clearTextAnalysis">清空选择</button></div>
+              </div>
+              <div class="record-list" id="textResults">
+                <div class="empty large"><span class="empty-symbol icon-mask icon-search" aria-hidden="true"></span><strong>输入内容开始检索</strong><p>综合搜索、DN 编号和字段组合分别适用于不同查询任务。</p></div>
+              </div>
+              <section class="report-panel" id="reportPanel" hidden>
+                <div class="report-panel-head">
+                  <div><span class="eyebrow">EVIDENCE-BOUND ANALYSIS</span><h2>批量晶圆异常分析报告</h2><p>仅分析用户勾选的记录，生成根因假设、验证方案和统计图。</p></div>
+                  <button class="button primary" type="button" id="generateReport" disabled>分析已选记录</button>
+                </div>
+                <div id="reportOutput"><div class="empty small">点击生成后，报告不会改动原始检索数据。</div></div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="page-image">
+          <div class="page-heading image-page-heading">
+            <div><span class="eyebrow">VISUAL RETRIEVAL</span><h1>图片与 PPT 检索</h1></div>
+            <div class="wafer-hero" aria-hidden="true"><img src="/static/assets/images/wafer-macro.webp" alt=""></div>
+          </div>
+          <div class="panel image-query-panel unified-query-panel">
+              <div class="panel-heading"><div><span class="step-index">01</span><h2>选择检索材料</h2></div></div>
+              <div class="unified-upload-grid">
+              <label class="image-upload" id="imageDrop">
+                <input id="imageFile" type="file" multiple>
+                <div id="imagePreview" class="image-preview"><span class="upload-icon image-icon" aria-hidden="true"><i></i></span><strong>选择或拖入文件</strong></div>
+              </label>
+              <div class="query-file-panel">
+                <div class="query-file-head"><strong>已选择文件</strong><button class="text-button" id="clearImageFiles" type="button">清空</button></div>
+                <div class="query-file-list" id="imageSelectedFiles"><div class="empty small">尚未选择文件</div></div>
+              </div>
+              </div>
+              <button class="button primary full" id="imageSearch" disabled>查找相似记录</button>
+          </div>
+          <div id="imageOutput"></div>
+        </section>
+
+        <section class="page" id="page-report">
+          <div class="report-page-shell">
+            <header class="report-page-header">
+              <div>
+                <span class="eyebrow">VISUAL ANALYSIS REPORT</span>
+                <h1>晶圆异常可视化分析报告</h1>
+                <p id="reportPageSubtitle">基于选定检索结果生成，所有结论均保留证据记录。</p>
+              </div>
+              <div class="report-page-actions">
+                <span class="status-pill" id="reportPageSource">本地模型分析</span>
+                <button class="button ghost" type="button" id="backToResults">返回检索结果</button>
+              </div>
+            </header>
+            <section class="report-composer" id="reportComposer">
+              <div class="report-composer-head">
+                <div><span class="eyebrow">MULTIMODAL INPUT</span><h2>补充本次异常信息</h2><p>现场描述和图片会先检索 Qdrant，再与已选记录合并分析；不会写回原始记录。</p></div>
+                <span class="status-pill">Qdrant 知识增强</span>
+              </div>
+              <div class="report-input-grid">
+                <label class="report-text-input"><span>现场文字 / 工程师备注</span><textarea id="reportUserContext" maxlength="4000" placeholder="例如：该异常在 PM 后首次出现，集中于晶圆右侧边缘；请重点分析腔体、搬运和颗粒来源。"></textarea><small><b id="reportContextCount">0</b> / 4000</small></label>
+                <div class="report-image-input">
+                  <div class="report-image-head"><span>现场图片（最多 8 张）</span><button class="text-button" type="button" id="clearReportImages">清空</button></div>
+                  <label class="report-image-drop"><input id="reportUserImages" type="file" accept="image/*" multiple><span class="icon-mask icon-image" aria-hidden="true"></span><strong>选择 Bin Map 或 SEM 图片</strong><small>单张不超过 20MB</small></label>
+                  <div class="report-image-previews" id="reportImagePreviews"><div class="empty small">未添加图片</div></div>
+                </div>
+              </div>
+              <div class="report-composer-foot"><p id="reportEvidenceHint">可直接生成，也可补充文字和图片后综合分析。</p><button class="button primary" type="button" id="runMultimodalReport">开始综合分析</button></div>
+            </section>
+            <div class="report-page-output" id="standaloneReportOutput">
+              <div class="empty large"><span class="empty-symbol">R</span><strong>尚未生成分析报告</strong><p>请在文字检索或图片检索中选择记录后点击分析。</p></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <aside class="analysis-float" id="analysisFloat" hidden aria-live="polite">
+    <div class="float-drag-handle" data-float-drag title="按住拖动">
+      <span class="float-drag-grip" aria-hidden="true">⠿</span>
+      <div class="analysis-float-icon" aria-hidden="true">AI</div>
+      <div class="analysis-float-copy"><small>批量分析</small><strong id="analysisFloatCount">已选 0 条</strong></div>
+    </div>
+    <button class="text-button" type="button" id="analysisFloatClear">清空</button>
+    <button class="button primary" type="button" id="analysisFloatRun">立即分析</button>
+  </aside>
+
+  <aside class="analysis-float comparison-float" id="comparisonFloat" hidden aria-live="polite">
+    <div class="float-drag-handle" data-float-drag title="按住拖动">
+      <span class="float-drag-grip" aria-hidden="true">⠿</span>
+      <div class="analysis-float-icon comparison-icon" aria-hidden="true">⇄</div>
+      <div class="analysis-float-copy"><small>记录对比</small><strong id="comparisonFloatCount">已选 0 条</strong></div>
+    </div>
+    <button class="text-button" type="button" id="comparisonFloatClear">清空</button>
+    <button class="button primary" type="button" id="comparisonFloatOpen">开始对比</button>
+  </aside>
+
+  <div class="roi-editor" id="roiEditor" aria-hidden="true">
+    <div class="roi-editor-card" role="dialog" aria-modal="true" aria-labelledby="roiEditorTitle">
+      <header>
+        <h2 id="roiEditorTitle">选择检索区域</h2>
+        <button class="icon-button" id="roiEditorClose" type="button" aria-label="关闭">×</button>
+      </header>
+      <div class="roi-editor-body">
+        <div class="roi-editor-tools" role="group" aria-label="选区形状">
+          <button class="active" id="roiModeRectangle" type="button">矩形选区</button>
+          <button id="roiModePolygon" type="button">自由选区</button>
+        </div>
+        <div class="roi-stage" id="roiStage">
+          <img id="roiImage" alt="待画框的 Bin Map">
+          <div class="roi-overlay-layer" id="roiOverlayLayer"></div>
+        </div>
+        <p id="roiEditorStatus">拖动绘制矩形；可连续添加多个区域</p>
+      </div>
+      <footer>
+        <button class="button secondary" id="roiEditorReset" type="button">清除画框</button>
+        <div><button class="button secondary" id="roiEditorCancel" type="button">取消</button><button class="button primary" id="roiEditorApply" type="button">使用此区域</button></div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
+    <header><div><small>历史异常记录</small><h2 id="detailTitle">记录详情</h2></div><button class="icon-button" id="detailClose" aria-label="关闭">×</button></header>
+    <div class="detail-body" id="detailBody"></div>
+  </aside>
+  <div class="comparison-backdrop" id="comparisonBackdrop"></div>
+  <section class="comparison-modal" id="comparisonModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="comparisonTitle">
+    <header><div><small>异常记录对比</small><h2 id="comparisonTitle">记录对比</h2></div><button class="icon-button" id="comparisonClose" type="button" aria-label="关闭">×</button></header>
+    <div class="comparison-body" id="comparisonBody"></div>
+  </section>
+  <div class="lightbox" id="lightbox"><button id="lightboxClose" aria-label="关闭图片">×</button><img id="lightboxImage" alt="图片预览"></div>
+  <div class="toast" id="toast"></div>
+  <script src="/static/app.js?v=20260922-multimodal-report"></script>
+</body>
+</html>

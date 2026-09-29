@@ -1,0 +1,108 @@
+{
+  "package_type": "lightweight_source_and_business_data",
+  "generated_for": "Codex-assisted deployment on another Windows computer",
+  "runtime": {
+    "os": "Windows 10/11 x64",
+    "python": "3.12",
+    "docker_desktop": "WSL2 Linux containers",
+    "recommended_gpu": "NVIDIA CUDA GPU; 4 GB VRAM minimum for Qwen report generation, more VRAM recommended for DINOv2 ViT-L/14",
+    "web_port": 8002,
+    "qdrant_port": 6333,
+    "ollama_port": 8333,
+    "dinov2_port": 9911
+  },
+  "download_models": [
+    {
+      "name": "qwen3-embedding:0.6b",
+      "provider": "Ollama",
+      "command": "docker exec wafer-qwen ollama pull qwen3-embedding:0.6b",
+      "purpose": "1024-dimensional Chinese/English wafer text embeddings"
+    },
+    {
+      "name": "qwen3:4b-instruct",
+      "provider": "Ollama",
+      "command": "docker exec wafer-qwen ollama pull qwen3:4b-instruct",
+      "purpose": "local generative wafer anomaly reports"
+    },
+    {
+      "name": "qwen3-wafer-report:latest",
+      "provider": "derived locally from qwen3:4b-instruct",
+      "command": "docker exec wafer-qwen ollama create qwen3-wafer-report -f /tmp/Modelfile.qwen3-report",
+      "parameters": {"num_ctx": 8192}
+    },
+    {
+      "name": "dinov2_vitl14_pretrain.pth",
+      "provider": "Meta DINOv2 official weights",
+      "url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitl14/dinov2_vitl14_pretrain.pth",
+      "destination": "models/dinov2_base/dinov2_vitl14_pretrain.pth",
+      "purpose": "SEM and Bin Map image embeddings"
+    }
+  ],
+  "included_trained_weights": [
+    "models/deployed_model/best_model.pt",
+    "models/deployed_model/resolved_config.json",
+    "models/deployed_model/binmap_adapter/best_adapter.pt"
+  ],
+  "dinov2_classifier_training": {
+    "backbone": "dinov2_vitl14",
+    "image_size": 224,
+    "feature_layers": 4,
+    "include_patch_mean": true,
+    "dropout": 0.2,
+    "classes": 6,
+    "head_epochs": 60,
+    "head_lr": 0.001,
+    "unfreeze_last_blocks": 0,
+    "finetune_epochs": 0,
+    "batch_size": 4,
+    "feature_batch_size": 256,
+    "gradient_accumulation": 4,
+    "weight_decay": 0.01,
+    "label_smoothing": 0.05,
+    "early_stopping_patience": 12,
+    "amp": true,
+    "selection_metric": "macro_f1",
+    "tta": ["identity", "hflip", "vflip"]
+  },
+  "binmap_lora_training": {
+    "epochs": 30,
+    "batch_size": 2,
+    "workers": 2,
+    "learning_rate": 0.00005,
+    "weight_decay": 0.0001,
+    "temperature": 0.09,
+    "queue_size": 512,
+    "lora_rank": 8,
+    "lora_alpha": 16.0,
+    "lora_dropout": 0.05,
+    "lora_last_blocks": 6,
+    "seed": 20260826,
+    "validation_ratio": 0.12
+  },
+  "report_generation": {
+    "model": "qwen3-wafer-report:latest",
+    "temperature": 0.2,
+    "top_p": 0.85,
+    "presence_penalty": 1.2,
+    "max_tokens": 2200,
+    "reasoning_effort": "none",
+    "max_evidence_records": 20,
+    "knowledge_top_k": 4
+  },
+  "qdrant": {
+    "business_collection": "wafer_dn_records_v2",
+    "knowledge_collection": "wafer_analysis_knowledge_v1",
+    "text_vector": "text_chunks",
+    "sem_multivector": "sem_images",
+    "binmap_multivector": "binmap_images",
+    "runtime_source": "qdrant_only"
+  },
+  "excluded_rebuildable_items": [
+    "Docker image archives",
+    "Python virtual environment",
+    "Docker named volumes",
+    "Qdrant generated vectors",
+    "Ollama downloaded model blobs",
+    "logs and caches"
+  ]
+}

@@ -1,0 +1,20 @@
+ARG BASE_IMAGE=pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
+FROM ${BASE_IMAGE}
+
+LABEL org.opencontainers.image.title="Wafer RAG DINOv2 online-build inference API"
+
+COPY server/training_package/training/requirements_runtime.txt /opt/wafer/requirements_runtime.txt
+COPY server/inference_api/requirements_api.txt /opt/wafer/requirements_api.txt
+RUN python -m pip install --no-cache-dir \
+      -r /opt/wafer/requirements_runtime.txt \
+      -r /opt/wafer/requirements_api.txt && \
+    python -m pip check
+
+COPY server/training_package/training /package/training
+COPY server/inference_api/inference_api /app/inference_api
+COPY models/dinov2_base/dinov2_vitl14_pretrain.pth /app/weights/dinov2_vitl14_pretrain.pth
+
+ENV PYTHONPATH=/package/training:/app
+WORKDIR /app
+EXPOSE 8001
+CMD ["python", "-m", "uvicorn", "inference_api.server:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]

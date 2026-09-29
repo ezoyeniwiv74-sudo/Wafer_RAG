@@ -1,0 +1,114 @@
+[
+  {
+    "knowledge_id": "HT-INSPECTION-001",
+    "title": "随机缺陷与系统性缺陷的空间模式判别",
+    "organization": "Hitachi High-Tech",
+    "url": "https://www.hitachi-hightech.com/global/en/knowledge/semiconductor/room/manufacturing/inspection.html",
+    "topics": ["空间分布", "随机缺陷", "系统性缺陷", "图形晶圆"],
+    "summary_zh": "随机缺陷通常由颗粒等偶发因素造成，位置难以预测；系统性缺陷往往由掩模或曝光等工艺因素导致，并在相同图形位置重复出现。图形晶圆检查可通过相邻 die 的图形差异定位异常。",
+    "analysis_methods": [
+      "比较缺陷是否在相同 die 坐标或重复图形位置复现",
+      "将随机散点、局部聚类和跨 wafer 重复图形分别统计",
+      "对重复位置异常优先核查掩模、曝光和对应上游工艺"
+    ],
+    "limitations": "空间模式只能形成根因假设，仍需结合设备履历、复检图像和工艺量测确认。"
+  },
+  {
+    "knowledge_id": "HT-INSPECTION-002",
+    "title": "亮场、暗场检查与缺陷坐标证据",
+    "organization": "Hitachi High-Tech",
+    "url": "https://www.hitachi-hightech.com/global/en/knowledge/semiconductor/room/manufacturing/metrology-inspection.html",
+    "topics": ["缺陷坐标", "亮场", "暗场", "抽样复检"],
+    "summary_zh": "晶圆检查的核心输出包括缺陷存在性和 X/Y 坐标。亮场适合观察精细图形缺陷，暗场适合高速颗粒检查；量测与检查通常通过抽样策略平衡覆盖率和吞吐量。",
+    "analysis_methods": [
+      "保留缺陷坐标、检查模式、采样比例和复检结果",
+      "对高风险空间簇提高复检采样而不是只看总缺陷数",
+      "分别评价检测灵敏度变化与真实工艺异常"
+    ],
+    "limitations": "不同检查模式的灵敏度不同，未经归一化的缺陷数量不应直接比较。"
+  },
+  {
+    "knowledge_id": "HT-ADC-003",
+    "title": "自动缺陷分类与良率管理闭环",
+    "organization": "Hitachi High-Tech",
+    "url": "https://www.hitachi-hightech.com/global/en/knowledge/semiconductor/room/words.html",
+    "topics": ["ADC", "ADR", "缺陷分类", "YMS"],
+    "summary_zh": "自动缺陷复检和自动缺陷分类可将缺陷图像与类别数据传递给良率管理或主机系统，用于后续失效与缺陷分析。分类结果应与原始图像、坐标和批次数据保持可追溯关联。",
+    "analysis_methods": [
+      "按缺陷类别制作 Pareto 并保留原图和坐标追溯",
+      "监控分类置信度和未知类比例，避免模型漂移掩盖新缺陷",
+      "将分类变化与批次、设备、站点和时间窗口交叉分析"
+    ],
+    "limitations": "自动分类结果是辅助证据，低置信度或新型缺陷仍需人工复核。"
+  },
+  {
+    "knowledge_id": "AMAT-PC-004",
+    "title": "在线监控、SPC 与异常批次追溯",
+    "organization": "Applied Materials",
+    "url": "https://www.appliedmaterials.com/us/en/blog/blog-posts/introducing-a-new-playbook-in-process-control.html",
+    "topics": ["SPC", "异常漂移", "在线监控", "设备履历", "根因追溯"],
+    "summary_zh": "过程控制可以利用产线大数据和统计过程控制预测或检测良率偏移，在风险扩大前暂停后续加工，并沿工艺和设备履历回溯潜在根因。",
+    "analysis_methods": [
+      "按时间窗口绘制缺陷率与设备、腔体、配方的变化趋势",
+      "将异常批次与前后正常批次对照并回溯共同设备路径",
+      "先识别偏移起点，再验证维护、耗材、配方或环境变化"
+    ],
+    "limitations": "相关性和时间先后不能单独证明因果关系，需通过对照批次或工程实验验证。"
+  },
+  {
+    "knowledge_id": "AMAT-REVIEW-005",
+    "title": "光学检查与电子束复检的缺陷筛选闭环",
+    "organization": "Applied Materials",
+    "url": "https://www.appliedmaterials.com/kr/ko/semiconductor/products/processes/metrology-and-inspection/enlight-optical-inspection.html",
+    "topics": ["光学检查", "电子束复检", "噪声抑制", "良率杀手"],
+    "summary_zh": "高通量光学检查可与高分辨率电子束复检和分类结合，用于从大量候选信号中区分真正影响良率的缺陷与非关键噪声。",
+    "analysis_methods": [
+      "先以高通量检查定位候选，再对代表性缺陷进行高分辨率复检",
+      "按类别、空间簇和良率相关性区分关键缺陷与 nuisance 信号",
+      "对新增或罕见类别保留人工确认和再训练样本"
+    ],
+    "limitations": "如果采样只覆盖高频类别，低频但高风险的缺陷可能被遗漏。"
+  },
+  {
+    "knowledge_id": "AMAT-SEMVISION-006",
+    "title": "高密度缺陷图、实时分类与可行动根因分析",
+    "organization": "Applied Materials",
+    "url": "https://www.appliedmaterials.com/in/en/product-library/semvision-g9-defect-analysis.html",
+    "topics": ["高密度缺陷图", "实时分类", "根因分析", "纠正措施"],
+    "summary_zh": "高密度缺陷图与高分辨率复检、实时分类结合，可以把缺陷形貌、位置和类别转化为更可执行的根因线索。",
+    "analysis_methods": [
+      "将高密度空间分布与代表性缺陷形貌同时纳入判断",
+      "按缺陷类别形成 Pareto，并关联可能的工艺步骤和纠正措施",
+      "对每个根因假设明确支持证据、反证条件和验证动作"
+    ],
+    "limitations": "分类和形貌相似不等于来源相同，必须结合工艺上下文。"
+  },
+  {
+    "knowledge_id": "AMAT-AI-007",
+    "title": "关键缺陷与噪声信号的 AI 分类边界",
+    "organization": "Applied Materials",
+    "url": "https://www.appliedmaterials.com/us/en/product-library/semvision-h20-defect-analysis.html",
+    "topics": ["AI 分类", "关键缺陷", "噪声", "客户样本"],
+    "summary_zh": "缺陷分析系统需要区分关键缺陷、非关键 nuisance 信号和背景噪声；分类模型应使用本厂图像和工艺上下文进行适配。",
+    "analysis_methods": [
+      "报告中分开呈现模型分类、原始证据和工程师确认状态",
+      "使用本厂已确认样本评估误报、漏报和未知类",
+      "不把单次模型预测直接写成已确认根因"
+    ],
+    "limitations": "跨产品、跨层次或跨设备直接复用分类结论可能产生域偏移。"
+  },
+  {
+    "knowledge_id": "KLA-SPATIAL-008",
+    "title": "空间聚类与已知缺陷模式对照",
+    "organization": "KLA",
+    "url": "https://ir.kla.com/sec-filings/all-sec-filings/content/9999999997-09-025277/9999999997-09-025277.paper",
+    "topics": ["空间聚类", "已知模式", "边缘检查", "异常偏移"],
+    "summary_zh": "缺陷数据可通过空间分布与聚类分析和已知缺陷模式进行对照，边缘及其他表面的检查结果也可共同用于识别过程异常。",
+    "analysis_methods": [
+      "对中心、边缘、环形、扇区、划痕和局部簇进行模式标注",
+      "比较不同表面或不同步骤的空间共现关系",
+      "用历史已确认模式作为相似性提示，并保留当前批次的独立验证"
+    ],
+    "limitations": "历史模式相似仅能提高假设优先级，不能替代当前批次的量测确认。"
+  }
+]
